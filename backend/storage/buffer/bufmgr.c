@@ -2925,13 +2925,14 @@ FlushBuffer(BufferDesc *buf, SMgrRelation reln)
 			  buf->tag.blockNum,
 			  bufToWrite,
 			  false);
-	SyncFlushPageToMemoryPool(bufToWrite, (KeyType){
-		reln->smgr_rnode.node.spcNode,
-		reln->smgr_rnode.node.dbNode,
-		reln->smgr_rnode.node.relNode,
-		buf->tag.forkNum,
-		buf->tag.blockNum,
-	});
+	if(IsRpcClient > 1)
+		SyncFlushPageToMemoryPool(bufToWrite, (KeyType){
+			reln->smgr_rnode.node.spcNode,
+			reln->smgr_rnode.node.dbNode,
+			reln->smgr_rnode.node.relNode,
+			buf->tag.forkNum,
+			buf->tag.blockNum,
+		});
 
 	if (track_io_timing)
 	{
@@ -3426,13 +3427,14 @@ FlushRelationBuffers(Relation rel)
 						  bufHdr->tag.blockNum,
 						  localpage,
 						  false);
-				SyncFlushPageToMemoryPool(localpage, (KeyType){
-					rel->rd_smgr->smgr_rnode.node.spcNode,
-					rel->rd_smgr->smgr_rnode.node.dbNode,
-					rel->rd_smgr->smgr_rnode.node.relNode,
-					bufHdr->tag.forkNum,
-					bufHdr->tag.blockNum,
-				});
+				if(IsRpcClient > 1)
+					SyncFlushPageToMemoryPool(localpage, (KeyType){
+						rel->rd_smgr->smgr_rnode.node.spcNode,
+						rel->rd_smgr->smgr_rnode.node.dbNode,
+						rel->rd_smgr->smgr_rnode.node.relNode,
+						bufHdr->tag.forkNum,
+						bufHdr->tag.blockNum,
+					});
 
 				buf_state &= ~(BM_DIRTY | BM_JUST_DIRTIED);
 				pg_atomic_unlocked_write_u32(&bufHdr->state, buf_state);

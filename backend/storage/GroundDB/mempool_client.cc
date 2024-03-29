@@ -97,7 +97,7 @@ bool FetchPageFromMemoryPool(char* des, KeyType PageID, RDMAReadPageInfo* rdma_r
 	ibv_mr pa_mr, pida_mr;
 	rdma_mg->Allocate_Local_RDMA_Slot(pa_mr, DSMEngine::PageArray);
 	rdma_mg->Allocate_Local_RDMA_Slot(pida_mr, DSMEngine::PageIDArray);
-	rdma_mg->RDMA_Read(&rdma_read_info->remote_pa_mr, &pa_mr, rdma_read_info->pa_ofs * sizeof(BLCKSZ), sizeof(BLCKSZ), IBV_SEND_SIGNALED, 1, 1, "main");
+	rdma_mg->RDMA_Read(&rdma_read_info->remote_pa_mr, &pa_mr, rdma_read_info->pa_ofs * BLCKSZ, BLCKSZ, IBV_SEND_SIGNALED, 1, 1, "main");
 	rdma_mg->RDMA_Read(&rdma_read_info->remote_pida_mr, &pida_mr, rdma_read_info->pa_ofs * sizeof(KeyType), sizeof(KeyType), IBV_SEND_SIGNALED, 1, 1, "main");
 	
 	auto res_page = (uint8_t*)pa_mr.addr;
